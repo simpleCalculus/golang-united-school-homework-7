@@ -1,7 +1,6 @@
 package coverage
 
 import (
-	"log"
 	"os"
 	"testing"
 	"time"
@@ -42,24 +41,28 @@ func TestLen(t *testing.T) {
 	}
 }
 
-func TestLess(t *testing.T) {
+func TestLess_birthdayEquals(t *testing.T) {
 	b := time.Now()
 	people := p
 	people[0].birthDay = b
 	people[1].birthDay = b
 	
-	if !p.Less(0, 1) {
-		t.Error("error occured in func Less")
+	if !people.Less(0, 1) {
+		t.Error("must be sorting in ascending order of first names")
 	}
 
-	p[0].firstName = p[1].firstName
-	if !p.Less(0, 1) {
-		t.Error("error occured in func Less")
+	people[0].firstName = people[1].firstName
+	if !people.Less(0, 1) {
+		t.Error("must be sorting in ascending order of last names")
 	}
+}
 
-	p[0].birthDay = time.Now().Add(100)
+func TestLess_birthdayNotEquals(t *testing.T) {
+	people := p
+
+	people[0].birthDay = people[1].birthDay.AddDate(1, 0, 0)
 	if !p.Less(0, 1) {
-		t.Error("error occured in func Less")
+		t.Error("sort by birthday in descending order")
 	}
 }
 
@@ -68,7 +71,6 @@ func TestSwap(t *testing.T) {
 	p1 := people[0]
 	p2 := people[1]
 	people.Swap(0, 1)
-	log.Println(people[0], people[1], p1, p2)
 	if people[0] != p2 || people[1] != p1 {
 		t.Error("error occured in func Swap(i, j)")
 	}
@@ -94,22 +96,19 @@ func TestNew(t *testing.T) {
 	}
 	
 	strmtr = 
-	`
-	1
-	2 3
-	`
+	`1
+	2 3`
 	matrix, err = New(strmtr)
 	if err == nil {
 		t.Errorf("there should be an error here, dimensions are not correct")
 	}
 
 	strmtr = 
-	`
-	1 deef
+	`1 deef
 	eerg 5`
 	matrix, err = New(strmtr)
 	if err == nil {
-		t.Errorf("there should be an error here, data is not an integer")
+		t.Errorf("there should be an InvalidSyntax error here")
 	}
 }
 
